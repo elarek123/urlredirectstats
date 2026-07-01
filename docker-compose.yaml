@@ -42,18 +42,18 @@ services:
       - POSTGRES_DB=${DB_DATABASE}
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-  phpmyadmin:
-    container_name: ${APP_NAME}-phpmyadmin
-    image: phpmyadmin/phpmyadmin
-    ports:
-      - "808:80"
-    environment:
-      - PMA_HOST=${DB_HOST}
-      - PMA_USER=${DB_USERNAME}
-      - PMA_PASSWORD=${DB_PASSWORD}
-      - PMA_ARBITRARY=1
-    networks:
-      - backend
+#  phpmyadmin:
+#    container_name: ${APP_NAME}-phpmyadmin
+#    image: phpmyadmin/phpmyadmin
+#    ports:
+#      - "808:80"
+#    environment:
+#      - PMA_HOST=${DB_HOST}
+#      - PMA_USER=${DB_USERNAME}
+#      - PMA_PASSWORD=${DB_PASSWORD}
+#      - PMA_ARBITRARY=1
+#    networks:
+#      - backend
 #  frontend:
 #    build:
 #      context: ./docker/frontend
