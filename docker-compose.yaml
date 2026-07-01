@@ -1,0 +1,83 @@
+services:
+  app:
+    container_name: ${APP_NAME}-app
+    build:
+      context: docker/php
+      network: host
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./:/var/www
+      - ~/.ssh:/root/.ssh
+      - ./docker/php/conf/php.ini:/usr/local/etc/php/php.ini
+    working_dir: /var/www
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    networks:
+      - backend
+  nginx:
+    container_name: ${APP_NAME}-nginx
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./:/var/www
+    networks:
+      - backend
+  db:
+    container_name: ${APP_NAME}-db
+    image: postgres:latest
+    cap_add:
+      - SYS_NICE
+    networks:
+      - backend
+    volumes:
+      - ./docker/db/db_data:/var/lib/postgresql
+      - ./docker/db/dumps:/docker-entrypoint-initdb.d/
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+  phpmyadmin:
+    container_name: ${APP_NAME}-phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "808:80"
+    environment:
+      - PMA_HOST=${DB_HOST}
+      - PMA_USER=${DB_USERNAME}
+      - PMA_PASSWORD=${DB_PASSWORD}
+      - PMA_ARBITRARY=1
+    networks:
+      - backend
+#  frontend:
+#    build:
+#      context: ./docker/frontend
+#    container_name: ${APP_NAME}-frontend
+#    working_dir: /var/www
+#    ports:
+#      - "8080:8080"
+#    volumes:
+#      - ./:/var/www
+#    command: bash -c "rm -rf node_modules/.vite && rm -rf public/build && npm install && npm run build"
+#  redis:
+#    container_name: ${APP_NAME}-redis
+#    image: redis:latest
+#    restart: on-failure
+#    networks:
+#      - backend
+#    ports:
+#      - "6379:6379"
+#    command: "redis-server --appendonly yes --requirepass 123"
+#    volumes:
+#      - ./docker/redis/db_data:/root/redis
+#    environment:
+#      - REDIS_PORT=6379
+
+networks:
+  backend:
+    name: backend
